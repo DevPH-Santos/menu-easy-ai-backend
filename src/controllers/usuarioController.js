@@ -13,11 +13,11 @@ const login = (req, res) => {
   usuarioService.loginUsuario(req.body, (err, usuario) => {
     if (err) return res.status(401).json({ erro: err.message });
 
-    // 🔥 GERAR TOKEN AQUI
+    // gerar token
     const token = jwt.sign(
       {
         id: usuario.pk_cpf_usuario,
-        admin: usuario.admin // importante pro painel
+        admin: usuario.admin_usuario === 1 // ✅ Corrigido
       },
       "SEGREDO_SUPER_FORTE",
       { expiresIn: "7d" }
@@ -26,7 +26,7 @@ const login = (req, res) => {
     res.status(200).json({
       mensagem: 'Login realizado com sucesso',
       usuario,
-      token // 🔥 envia pro frontend
+      token
     });
   });
 };
@@ -34,23 +34,23 @@ const login = (req, res) => {
 // Mapeamento: valores do frontend → nomes no banco
 const MAPA_PREFERENCIAS = {
   // food_type
-  beef:     'carne',
-  chicken:  'frango',
-  pasta:    'massa',
-  burgers:  'lanche',
-  salads:   'vegetariano',
-  fish:     'peixe',
+  beef: 'carne',
+  chicken: 'frango',
+  pasta: 'massa',
+  burgers: 'lanche',
+  salads: 'vegetariano',
+  fish: 'peixe',
   // dietary_restrictions
-  lactose:  'tem_lactose',
-  gluten:   'gluten',
-  vegan:    'vegano',
+  lactose: 'tem_lactose',
+  gluten: 'gluten',
+  vegan: 'vegano',
   vegetarian: 'vegetariano',
   no_spicy: 'pimenta',
   // meal_preferences
   light_meals: 'fitness',
-  fast_meals:  'preparo_rapido',
+  fast_meals: 'preparo_rapido',
   cheap_meals: 'prato_principal',
-  spicy:       'pimenta',
+  spicy: 'pimenta',
 };
 
 const salvarPreferencias = (req, res) => {

@@ -1,4 +1,3 @@
-const jwt = require("jsonwebtoken");
 const usuarioModel = require('../models/usuarioModel');
 const bcrypt = require('bcrypt');
 
@@ -53,15 +52,7 @@ const loginUsuario = (dados, callback) => {
       }
 
       delete usuario.senha_usuario;
-
-      // 🔥 GERAR TOKEN
-      const token = jwt.sign(
-        { id: usuario.pk_cpf_usuario, admin: usuario.admin },
-        "SEGREDO_SUPER_FORTE",
-        { expiresIn: "7d" }
-      );
-
-      callback(null, { usuario, token });
+      
     });
   });
 };
