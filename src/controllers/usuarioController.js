@@ -1,3 +1,4 @@
+const jwt = require("jsonwebtoken");
 const usuarioService = require('../services/usuarioService');
 const usuarioModel = require('../models/usuarioModel');
 
@@ -11,7 +12,22 @@ const cadastrar = (req, res) => {
 const login = (req, res) => {
   usuarioService.loginUsuario(req.body, (err, usuario) => {
     if (err) return res.status(401).json({ erro: err.message });
-    res.status(200).json({ mensagem: 'Login realizado com sucesso', usuario });
+
+    // 🔥 GERAR TOKEN AQUI
+    const token = jwt.sign(
+      {
+        id: usuario.pk_cpf_usuario,
+        admin: usuario.admin // importante pro painel
+      },
+      "SEGREDO_SUPER_FORTE",
+      { expiresIn: "7d" }
+    );
+
+    res.status(200).json({
+      mensagem: 'Login realizado com sucesso',
+      usuario,
+      token // 🔥 envia pro frontend
+    });
   });
 };
 

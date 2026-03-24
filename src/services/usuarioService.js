@@ -1,3 +1,4 @@
+const jwt = require("jsonwebtoken");
 const usuarioModel = require('../models/usuarioModel');
 const bcrypt = require('bcrypt');
 
@@ -27,14 +28,12 @@ const cadastrarUsuario = (usuario, callback) => {
   });
 };
 
-// 🔐 LOGIN
 const loginUsuario = (dados, callback) => {
 
   if (!dados.cpf || !dados.senha) {
     return callback(new Error("CPF e senha obrigatórios"));
   }
 
-  // limpar CPF
   const cpfLimpo = dados.cpf.replace(/\D/g, '');
 
   usuarioModel.buscarPorCpf(cpfLimpo, (err, results) => {
@@ -46,7 +45,6 @@ const loginUsuario = (dados, callback) => {
 
     const usuario = results[0];
 
-    // comparar senha criptografada
     bcrypt.compare(dados.senha, usuario.senha_usuario, (err, senhaValida) => {
       if (err) return callback(err);
 
@@ -54,10 +52,16 @@ const loginUsuario = (dados, callback) => {
         return callback(new Error("Senha inválida"));
       }
 
-      // remover senha antes de retornar
       delete usuario.senha_usuario;
 
-      callback(null, usuario);
+      // 🔥 GERAR TOKEN
+      const token = jwt.sign(
+        { id: usuario.pk_cpf_usuario, admin: usuario.admin },
+        "SEGREDO_SUPER_FORTE",
+        { expiresIn: "7d" }
+      );
+
+      callback(null, { usuario, token });
     });
   });
 };
